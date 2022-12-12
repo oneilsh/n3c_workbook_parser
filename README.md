@@ -49,6 +49,9 @@ begin with `#* `. The R node in `workbook1` illustrates this with more options s
 * Be contiguous (not contain any empty lines)
 * Be valid [YAML](https://en.wikipedia.org/wiki/YAML) after the special comment characters and space
 
+**Note 2**: All transforms in your code workbook(s) should have metadata blocks. Missing some will result in lack
+of output for those nodes and unconnected parts of the pipeline visualization.
+
 ## Metadata Fields
 
 The following fields are supported and illustrated in the second screenshot above:
@@ -59,10 +62,27 @@ The following fields are supported and illustrated in the second screenshot abov
   using `snake_case` names for your transforms, both in the name of the saved dataset 
   and in-workbook transform name (`plot_person` as `plot_person` in the screenshot above).
 
-* **`inputs:`** This field is required (unless you have a transform with no inputs for some reason...). It should
+* **`inputs:`** Required (unless you have a transform with no inputs for some reason...). It should
   be a YAML list of node names that are inputs to this node.
 
+* **`desc:`** Recommended. This should be a short description for the node, and will be used as hoverover text in
+  the output visualization. To conform to YAML standard you may need to wrap it in quotes (as above). You could also
+  use YAML multi-line strings, for example:
 
+  ```
+  #* some_transform:
+  #*   desc: |
+  #*     This is a multiline
+  #*     string in YAML. 
+  #*   inputs:
+  #*     - ...
+  ```
 
+  Note that when using multi-line strings your line breaks will be preserved, but additional line breaks may
+  also be added by the browsers hover-text.
 
+* **`ext:`** Recommended. This should be one of `py`, `R`, or `sql` to alert the parser to what kind
+  of transform is being parsed. This is used to set the filename in the per-transform code output, and 
+  the color of the node in the visualization.
 
+* **`attr:`** Optional. This field can be used to set settings for the node. 
