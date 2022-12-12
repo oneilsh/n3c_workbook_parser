@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+set -e
+
+if [ $# -ne 2 ]; then
+  echo "Usage: parse_notebooks <input_dir> <outout_dir>"
+  echo ""
+  echo "   <input_dir> should be a directory of code workbook pipeline.*"
+  echo "   files produced by the 'git export' feature"
+  echo ""
+  echo "   <output_dir> will contain the output files and transform map."
+  echo ""
+  echo "   WARNING: <output_dir> will be overwritten if it exists without warning."
+
+  exit 1
+fi
+
+
+
+INPUT_DIR=$1
+OUTPUT_DIR=$2
+# the full path to the directory containing this script:
+SCRIPT_DIR=$(realpath $(dirname ${BASH_SOURCE:-$_}))
+
+if [ -e $OUTPUT_DIR ]; then
+  read -p "WARNING: $OUTPUT_DIR and all of its contents will be overwritten. Contnue? y/n [n]: " CONTINUE
+  CONTINUE=${CONTINUE:-n}
+  if [ "$CONTINUE" != "y" ]; then
+    echo "Ok, not continuing."
+    exit 1
+  else
+    echo "Removing contents of $OUTPUT_DIR..."
+    rm -rf "$OUTPUT_DIR"/*
+  fi
+fi
+
+
+find $INPUT_DIR -name pipeline.\* -exec cat {} \; | $SCRIPT_DIR/utils/strip_extraneous.awk | $SCRIPT_DIR/utils/meta2yaml.sh | $SCRIPT_DIR/utils/parse_yaml_html.py $OUTPUT_DIR
+
+echo ""
+echo "Parse completed. Contents of $OUTPUT_DIR:"
+ls -1 "$OUTPUT_DIR"/*
+echo ""
+echo "You can view and browse the results in $OUTPUT_DIR/graph.html"
