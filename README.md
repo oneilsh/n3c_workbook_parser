@@ -124,58 +124,63 @@ The following fields are supported and illustrated in the second screenshot abov
 For this section we'll assume you are somewhat familiar with working with GitHub and a Unix-based command-line
 environment. 
 
-First, create a [new repository](https://docs.github.com/en/get-started/quickstart/create-a-repo) on GitHub to represent your project, with or without a README.md, and clone it to your
-local machine, and then change to the repo directory:
+First, we're goin to need a local project folder to work it, which will contain several git repositories.
 
 ```
-git clone https://github.com/oneilsh/n3c_example_project.git
-cd n3c_example_project
+mkdir n3c_example_project_local
+cd n3c_example_project_local
+```
+
+Next, create a [new repository](https://docs.github.com/en/get-started/quickstart/create-a-repo) on GitHub to represent 
+the public-facing view of your project, with or without a README.md, and clone it to your
+local machine. I've called mine `n3c_example_project_public`:
+
+```
+git clone https://github.com/oneilsh/n3c_example_project_public.git
 ```
 
 Now we need to clone the Code Workbooks from the Enclave. For each
 workbook, select the "gear" icon near the top, and then "Export git repository". 
-This will open a new browser tab, with a command to run to clone the workbook. 
-**But**, because we are placing a git repository (the workbook) inside of another
-(the project), we need to modify the command to add the URL as a git submodule.
-Each URL is unique to your account, so we don't show it below, but we clone down
-the two example workbooks:
+This will open a new browser tab, with a command to run to clone the workbook. Use
+the commands provided to clone the workbook repositories from the Enclave.
 
 ```
-git submodule add <long URL provided for workbook1>
-git submodule add <long URL provided for workbook2>
+git clone <long URL provided for workbook1>
+git clone <long URL provided for workbook2>
 ``` 
 
-We are also going to need this `workbook_parser` tooling, which we may as well
-store as a submodule too:
+Finally we are going to need this `workbook_parser` tooling:
 
 ```
-git submodule add https://github.com/oneilsh/n3c_workbook_parser.git
+git clone https://github.com/oneilsh/n3c_workbook_parser.git
 ```
 
 Now we can run the workbook parser. The two arguments are the directory to look for workbook files in (`.` for the current
-project directory), and the output folder to place results in (`docs` in this case):
+project directory), and the output folder to place results in (`n3c_example_project_public/docs` in this case):
 
 ```
-n3c_workbook_parser/parse_workbooks . docs
+n3c_workbook_parser/parse_workbooks . n3c_example_project_public/docs
 ```
 
 At this point we have a variety of subfolders: the two workbook folders `workbook1` and `workbook2`, the `n3c_workbook_parser`
-utility folder, and the `docs` output folder with individual code files for each transform and an `index.html` that you can 
+utility folder, and the public-facing repo with the `docs` output folder with individual code files for each transform and an `index.html` that you can 
 open to browse the transforms.
 
 ```
-.
-├── README.md
-├── docs
-│   ├── index.html
-│   ├── input_concept_set_members.sql
-│   ├── plot_person.R
-│   ├── pneumonia_concept_set.sql
-│   ├── pneumonia_conditions.sql
-│   └── pneumonia_expired_demographics.py
+n3c_example_project_local
+├── n3c_example_project_public
+│   ├── README.md
+│   └── docs
+│       ├── index.html
+│       ├── input_concept_set_members.sql
+│       ├── plot_person.R
+│       ├── pneumonia_concept_set.sql
+│       ├── pneumonia_conditions.sql
+│       └── pneumonia_expired_demographics.py
 ├── n3c_workbook_parser
 │   ├── README.md
 │   ├── docs_images
+│   │   ├── gh_pages.png
 │   │   ├── input_concept_set_members.png
 │   │   └── plot_person.png
 │   ├── parse_workbooks
@@ -198,16 +203,16 @@ open to browse the transforms.
     ├── pipeline.sql
     └── workbook.yml
 
-8 directories, 24 files
+9 directories, 25 files
 ```
 
-Because the output is saved as html in the docs directory, it is easy to create a 
-browsable page for the project. First we push all these changes up to GitHub
+Now that we have our public-facing repo built, we can push it up to GitHub (using `-C` to specify the 
+repo we want to push without having to move into it; you could also just `cd` to the directory as normal).
 
 ```
-git add -A
-git commit -m "Adding workbooks, parser, parsed results"
-git push
+git -C n3c_example_project_public add -A
+git -C n3c_example_project_public commit -m "Pushing parsed results"
+git -C n3c_example_project_public push
 ```
 
 On GitHub, we can configure the repo pages under Settings -> Pages, 
@@ -215,6 +220,8 @@ and select the `main` branch `docs` subfolder.
 
 ![gh_pages](./docs_images/gh_pages.png)
 
+Once it has built (you can see the build progress on the Actions tab),
+the page will be browsable at the URL indicated in the Pages settings tab.
 
 
 
