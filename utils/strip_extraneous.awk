@@ -1,4 +1,4 @@
-#!/usr/bin/env awk -f
+#!/usr/bin/env -S awk -f
 
 # this script should read on stdin one or more pipeline.* files
 # e.g. cat pipeline.* | ./strip_extraneous.awk
