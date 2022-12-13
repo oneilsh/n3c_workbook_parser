@@ -1,0 +1,65 @@
+name: Code Workbook Parser
+on: [push]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  parse_workbook:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install and cache apt packages
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with: 
+          packages: graphviz
+          version: 1.0
+#      - name: Install graphviz
+#        run: |
+#          sudo apt-get update
+#          sudo apt-get install -yq --no-install-recommends graphviz
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+#          cache: 'pip'
+      - name: Install dependencies
+        run: |
+          sudo dot -c
+          python -m pip install --upgrade pip
+          pip install pyyaml graphviz
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Clone submodule
+        run: git clone https://github.com/oneilsh/workbook_parser.git
+      - name: debug
+        run: pwd && ls
+      - name: Run parser
+        run: |
+          rm -rf docs
+          workbook_parser/parse_workbooks . docs
+      - name: Cleanup
+        run: |
+          rm -rf workbook_parser
+      - name: Save export to repo
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Refresh export
+      - name: Configure pages
+        uses: actions/configure-pages@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          enablement: true
+      - name: Deploy pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          publish_branch: master
+
+
