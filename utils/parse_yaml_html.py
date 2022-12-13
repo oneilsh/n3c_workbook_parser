@@ -102,7 +102,7 @@ for nodename in nodes:
         source_fh.close()
 
 # now write to the output dir an html file with svg version of the graph
-with open(os.path.join(outdir, "graph.html"), "w") as html_handle:
+with open(os.path.join(outdir, "index.html"), "w") as html_handle:
     html_handle.write("<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"utf-8\" /></head><body>\n")
     html_handle.write(str(dot.pipe(format = 'svg', encoding = 'ascii')) + "\n")
     html_handle.write("</body></html>")
