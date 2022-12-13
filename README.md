@@ -1,33 +1,41 @@
-# Code Workbooks Parser
+
+N3C Workbook Parser
+=================
 
 This small utility is developed for [N3C](https://covid.cd2h.org), to help 
 researchers publish code from Code Workbooks to git repositories in more browsable way.
 
-#### Features
+
+Table of Contents
+=================
+
+* [Overview](#overview)
+   * [Features](#features)
+   * [Requirements](#requirements)
+   * [Known Issues](#known-issues)
+   * [Future Ideas](#future-ideas)
+* [Example Usage](#example-usage)
+   * [Add Metadata to Workbook Transforms](#add-metadata-to-workbook-transforms)
+      * [Metadata Fields](#metadata-fields)
+   * [Initial Project Setup and Publishing](#initial-project-setup-and-publishing)
+   * [Pulling and Pushing Updates](#pulling-and-pushing-updates)
+   * [Using Branches](#using-branches)
+
+<!-- Created by https://github.com/ekalinin/github-markdown-toc -->
+
+
+# Overview
+
+## Features
 
 * Export each transform node as an independent code file
 * Creates an SVG-based browsable graph of the transform nodes with customization options
 * Supports multiple code workbooks
 
-#### Known Issues
+Browse example output at [https://oneilsh.github.io/n3c_example_project_public/](https://oneilsh.github.io/n3c_example_project_public/). Notice that
+there are both hover text descriptions, and nodes are clickable to browse the code.
 
-* The code could be more robust to non-conforming inputs
-* Requires a Unix-like environment with `sed`, `awk`, and `bash`
-* Each transform should be annotated by the user as python, R, or sql, when this could be derived automatically
-* For pipelines spanning multiple workbooks, information on which workbook each transform derives from is dropped
-
-All of the above could be solved by migrating all of the logic entirely to python -- pull requests welcome :)
-
-#### Future Ideas
-
-Additional metadata fields could be parsed and added to the visualization or outputs. Ideas include
-metadata on inputs, for example subfields of each input that describe the columns expected and their types,
-and/or integrated metadata on transform output. 
-
-It would also be nice to use github actions to re-build the parsed output and host it via github pages 
-on push. Early work on this exists in `utils/github`. 
-
-Support for parsing Code Repo exports would allow the use of parsed Repos and Workbooks in a single project.
+[![graph](./docs_images/graph.png)](https://oneilsh.github.io/n3c_example_project_public/)
 
 ## Requirements
 
@@ -38,6 +46,27 @@ To make this utility work, you will need the following:
 * python3, and the following python packages:
   * [graphviz](https://pypi.org/project/graphviz/)
   * [pyyaml](https://pypi.org/project/PyYAML/)
+
+## Known Issues
+
+* The code could be more robust to non-conforming inputs
+* Requires a Unix-like environment with `sed`, `awk`, and `bash`
+* Each transform should be annotated by the user as python, R, or sql, when this could be derived automatically
+* For pipelines spanning multiple workbooks, information on which workbook each transform derives from is dropped
+
+All of the above could be solved by migrating all of the logic entirely to python -- pull requests welcome :)
+
+## Future Ideas
+
+Additional metadata fields could be parsed and added to the visualization or outputs. Ideas include
+metadata on inputs, for example subfields of each input that describe the columns expected and their types,
+and/or integrated metadata on transform output. 
+
+Support for parsing Code Repo exports would allow the use of parsed Repos and Workbooks in a single project.
+
+It would also be nice to use github actions to re-build the parsed output and host it via github pages 
+on push. Early work on this exists in `utils/github`. This would also remove the dependency on `graphviz` et al. 
+
 
 # Example Usage
 
@@ -69,16 +98,16 @@ of output for those nodes and unconnected parts of the pipeline visualization.
 
 The following fields are supported and illustrated in the second screenshot above:
 
-* **Node name (e.g. `plot_person:` above)** Metadata must live under a heading defining the name of the node. 
+* **Node name (e.g. `plot_person:` above)** *Required.* Metadata must live under a heading defining the name of the node. 
   This can be anything you like, but note that it must be a valid YAML field name (no spaces), and it will
   be the name used to refer to this node as an input to other nodes. We recommend 
   using `snake_case` names for your transforms, both in the name of the saved dataset 
   and in-workbook transform name (`plot_person` as `plot_person` in the screenshot above).
 
-* **`inputs:`** Required (unless you have a transform with no inputs for some reason...). It should
+* **`inputs:`** *Required* (unless you have a transform with no inputs for some reason...). It should
   be a YAML list of node names that are inputs to this node.
 
-* **`desc:`** Recommended. This should be a short description for the node, and will be used as hoverover text in
+* **`desc:`** *Recommended.* This should be a short description for the node, and will be used as hoverover text in
   the output visualization. To conform to YAML standard you may need to wrap it in quotes (as above). You could also
   use YAML multi-line strings, for example:
 
@@ -94,11 +123,11 @@ The following fields are supported and illustrated in the second screenshot abov
   Note that when using multi-line strings your line breaks will be preserved, but additional line breaks may
   also be added by the browsers hover-text.
 
-* **`ext:`** Recommended. This should be one of `py`, `R`, or `sql` to alert the parser to what kind
+* **`ext:`** *Recommended.* This should be one of `py`, `R`, or `sql` to alert the parser to what kind
   of transform is being parsed. This is used to set the filename in the per-transform code output, and 
   the color of the node in the visualization.
 
-* **`attr:`** Optional. This field can be used to specify additional visualization settings for 
+* **`attr:`** *Optional.* This field can be used to specify additional visualization settings for 
   the node as `attribute: value` pairs referring to graphviz [node attributes](https://graphviz.org/docs/nodes/). 
   All attributes should be supported, with the exception of `tooltip` which is instead specified by `desc` above. 
   For example, to change the node to use a hexagon shape, blue fill, and font size of 20:
@@ -119,7 +148,7 @@ The following fields are supported and illustrated in the second screenshot abov
   use e.g. `fillcolor: "7"` to use the 7th color in this colorscheme. 
 
 
-## Project Setup, Initially Cloning Workbooks
+## Initial Project Setup and Publishing
 
 For this section we'll assume you are somewhat familiar with working with GitHub and a Unix-based command-line
 environment. 
@@ -164,7 +193,7 @@ n3c_workbook_parser/parse_workbooks . n3c_example_project_public/docs
 
 At this point we have a variety of subfolders: the two workbook folders `workbook1` and `workbook2`, the `n3c_workbook_parser`
 utility folder, and the public-facing repo with the `docs` output folder with individual code files for each transform and an `index.html` that you can 
-open to browse the transforms.
+open to browse the transforms. Note that the individual tranform files end in `.txt` - this is to make them more easily viewable in a web browser.
 
 ```
 n3c_example_project_local
@@ -172,11 +201,11 @@ n3c_example_project_local
 │   ├── README.md
 │   └── docs
 │       ├── index.html
-│       ├── input_concept_set_members.sql
-│       ├── plot_person.R
-│       ├── pneumonia_concept_set.sql
-│       ├── pneumonia_conditions.sql
-│       └── pneumonia_expired_demographics.py
+│       ├── input_concept_set_members.sql.txt
+│       ├── plot_person.R.txt
+│       ├── pneumonia_concept_set.sql.txt
+│       ├── pneumonia_conditions.sql.txt
+│       └── pneumonia_expired_demographics.py.txt
 ├── n3c_workbook_parser
 │   ├── README.md
 │   ├── docs_images
@@ -206,13 +235,13 @@ n3c_example_project_local
 9 directories, 25 files
 ```
 
-Now that we have our public-facing repo built, we can push it up to GitHub (using `-C` to specify the 
-repo we want to push without having to move into it; you could also just `cd` to the directory as normal).
+Now that we have our public-facing repo built, we can push it up to GitHub.
 
 ```
-git -C n3c_example_project_public add -A
-git -C n3c_example_project_public commit -m "Pushing parsed results"
-git -C n3c_example_project_public push
+cd n3c_example_project_public
+git add -A
+git commit -m "Pushing parsed results"
+git push
 ```
 
 On GitHub, we can configure the repo pages under Settings -> Pages, 
@@ -222,11 +251,52 @@ and select the `main` branch `docs` subfolder.
 
 Once it has built (you can see the build progress on the Actions tab),
 the page will be browsable at the URL indicated in the Pages settings tab.
+The page for this example is at [https://oneilsh.github.io/n3c_example_project_public/](https://oneilsh.github.io/n3c_example_project_public/).
+
+## Pulling and Pushing Updates
+
+As you work on your project you will likely make changes to your workbooks and possibly add new workbooks. Updating the public repository is 
+fairly easy: you just need to re-pull the workbook repositories from the enclave, re-run the parser, and re-push the public repo. 
+
+**NOTE! In order for updates to Code Workbooks to be saved so that they can be pulled down, just making text edits won't do it. You need to either run a 
+transform in the workbook, or create a new transform in the workbook.**
+
+So, supposing I've made a change to `workbook2` and-rerun a transform, I start by making sure I'm in the local project folder:
+
+```
+cd n3c_example_project_public 
+```
+
+Then do the requisite pull/build/push steps (using `-C` to pull and push the repositories without needing to move into them).
+Because the parsing step overwrites the output directory contents, you will be prompted to ensure this is what you want. 
+
+```
+git -C workbook2 pull
+n3c_workbook_parser/parse_workbooks . n3c_example_project_public/docs
+git -C n3c_example_project_public add -A
+git -C n3c_example_project_public commit -m "Updates in workbook2"
+git -C n3c_example_project_public push
+```
+
+The GitHub pages version will automatically re-deploy and be available in a couple of minutes.
 
 
+## Using Branches
 
+Code workbooks support branches, and these may be checked out for use in parsing. Note that
+if you want to use branches on your published repository, those will need to be created separately 
+(and GitHub pages will need to be configured to use the branch you'd like to publish).
 
+Supposing I've created a new `example_branch` on `workbook1` in the enclave, and run a transform to 
+commit that branch in the enclave, we just need to `git fetch` and `git switch` to the new branch.
 
+```
+cd workbook1
+git fetch
+git switch example_branch
+```
+
+From there the parsing script can be re-run to pick up the changes made in the new branch.
 
 
 
