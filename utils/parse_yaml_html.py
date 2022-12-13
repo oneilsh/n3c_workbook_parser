@@ -73,7 +73,7 @@ for nodename in nodes:
     dot.node(nodename, 
              label, 
              tooltip = node['desc'], 
-             URL = label,
+             URL = label + ".txt",
              target = "_blank",
              **attr)
 
@@ -97,7 +97,7 @@ for nodename in nodes:
 
             node['code'] = os.linesep.join(meta_yaml_lines + [node['code']])
 
-        source_fh = open(os.path.join(outdir, label), 'w')
+        source_fh = open(os.path.join(outdir, label + ".txt"), 'w')
         source_fh.write(node['code'])
         source_fh.close()
 
