@@ -264,7 +264,7 @@ transform in the workbook, or create a new transform in the workbook.**
 So, supposing I've made a change to `workbook2` and-rerun a transform, I start by making sure I'm in the local project folder:
 
 ```
-cd n3c_example_project_public 
+cd n3c_example_project_local
 ```
 
 Then do the requisite pull/build/push steps (using `-C` to pull and push the repositories without needing to move into them).
