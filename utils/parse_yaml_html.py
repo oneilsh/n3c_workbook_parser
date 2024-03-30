@@ -103,6 +103,22 @@ for nodename in nodes:
 
 # now write to the output dir an html file with svg version of the graph
 with open(os.path.join(outdir, "index.html"), "w") as html_handle:
-    html_handle.write("<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"utf-8\" /></head><body>\n")
+    html_handle.write("<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"utf-8\" />\n")
+    html_handle.write("""
+                        <style>
+                          .svg-container {
+                            width: 100%; /* This makes the container take the full width of its parent */
+                            overflow: auto; /* Adds scrolling if the SVG's height exceeds the viewport */
+                          }
+                          .svg-container svg {
+                            width: 100%; /* Makes the SVG responsive, scaling to the width of its container */
+                            height: auto; /* Preserves the aspect ratio of the SVG */
+                          }
+                        </style>
+                        </head>
+                        <body>
+                        <div class="svg-container">
+                        <h3>Hover over nodes for description. Click to open code in new tab.</h3>
+                      """)
     html_handle.write(str(dot.pipe(format = 'svg', encoding = 'ascii')) + "\n")
-    html_handle.write("</body></html>")
+    html_handle.write("</div></body></html>")
